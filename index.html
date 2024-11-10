@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku-like Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+      margin: 0;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, 40px);
+      grid-template-rows: repeat(9, 40px);
+      gap: 2px;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      font-size: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #ddd;
+      background-color: white;
+    }
+    .cell input {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      font-size: 18px;
+      border: none;
+      background-color: transparent;
+    }
+    .cell input:focus {
+      outline: none;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .button:disabled {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Sudoku-like Game</h1>
+    <div class="board" id="board"></div>
+    <div class="controls">
+      <button class="button" id="saveButton">Save Game</button>
+      <button class="button" id="loadButton" disabled>Load Game</button>
+    </div>
+  </div>
+
+  <script>
+    // Virtual identity for the user (for simplicity, using a random ID)
+    const virtualIdentity = "Player_" + Math.floor(Math.random() * 10000);
+
+    // Initial Sudoku grid (9x9)
+    const initialBoard = [
+      [5, 3, '', '', 7, '', '', '', ''],
+      [6, '', '', 1, 9, 5, '', '', ''],
+      ['', 9, 8, '', '', '', '', 6, ''],
+      [8, '', '', '', 6, '', '', '', 3],
+      [4, '', '', 8, '', 3, '', '', 1],
+      [7, '', '', '', 2, '', '', '', 6],
+      ['', 6, '', '', '', '', 2, 8, ''],
+      ['', '', '', 4, 1, 9, '', '', 5],
+      ['', '', '', '', 8, '', '', 7, 9]
+    ];
+
+    // Function to generate the board UI based on the current state
+    function generateBoard(board) {
+      const boardElement = document.getElementById('board');
+      boardElement.innerHTML = '';
+
+      for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = board[row][col] ? board[row][col] : '';
+          input.maxLength = 1;
+          input.addEventListener('input', () => handleInput(row, col, input));
+
+          cell.appendChild(input);
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    // Handle input and update the board state
+    function handleInput(row, col, input) {
+      const value = input.value;
+      if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 9)) {
+        initialBoard[row][col] = value;
+      } else {
+        input.value = ''; // If invalid input, clear the cell
+      }
+    }
+
+    // Save the game state in localStorage
+    function saveGame() {
+      localStorage.setItem(virtualIdentity, JSON.stringify(initialBoard));
+      document.getElementById('loadButton').disabled = false; // Enable Load button
+      alert('Game saved!');
+    }
+
+    // Load the game state from localStorage
+    function loadGame() {
+      const savedGame = localStorage.getItem(virtualIdentity);
+      if (savedGame) {
+        const board = JSON.parse(savedGame);
+        generateBoard(board);
+        alert('Game loaded!');
+      } else {
+        alert('No saved game found.');
+      }
+    }
+
+    // Initialize the game
+    function initGame() {
+      generateBoard(initialBoard);
+
+      document.getElementById('saveButton').addEventListener('click', saveGame);
+      document.getElementById('loadButton').addEventListener('click', loadGame);
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
